@@ -1,7 +1,7 @@
 import './studentHub.css';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowDownRight, ArrowRight, Bell, Bookmark, BookOpen, BriefcaseBusiness,
+  ArrowDownRight, ArrowRight, Bell, Bookmark, BookOpen, BriefcaseBusiness, Coins,
   CalendarDays, Check, ChevronDown, Clock3, Code2, Command, Coffee, Database,
   GraduationCap, LayoutDashboard, MapPin, Menu, MessageCircle, Network, Search, ShieldCheck, MessageSquare,
   Sparkles, Target, Users, X, Zap
@@ -9,6 +9,7 @@ import {
 import { learningResources, liveClasses, mentors, jobs, announcements } from './studentHubData';
 import NetworkFeatures from './NetworkFeatures';
 import AIPromptGuide from './AIPromptGuide';
+import SummerJobs from './SummerJobs';
 
 const nav = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -16,6 +17,7 @@ const nav = [
   { id: 'mentorship', label: 'Coaching & Mentorship', icon: Target, path: '/mentorship' },
   { id: 'classes', label: 'Classes & Timetable', icon: CalendarDays, path: '/classes' },
   { id: 'jobs', label: 'Jobs & Internships', icon: BriefcaseBusiness, path: '/jobs' },
+  { id: 'summer-jobs', label: 'Summer Jobs · Earn & Learn', icon: Coins, path: '/summer-jobs' },
   { id: 'skill-registry', label: 'Skill Registry', icon: MapPin, path: '/skill-registry' },
   { id: 'opportunities', label: 'Opportunity Board', icon: BriefcaseBusiness, path: '/opportunities' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/messages' },
@@ -28,6 +30,7 @@ const getRoute = (path) => {
   if (clean.startsWith('/learning')) return 'learning';
   if (clean.startsWith('/mentorship') || clean.startsWith('/coaching')) return 'mentorship';
   if (clean.startsWith('/classes') || clean.startsWith('/timetable')) return 'classes';
+  if (clean.startsWith('/summer-jobs') || clean.startsWith('/earn-while-you-learn')) return 'summer-jobs';
   if (clean.startsWith('/jobs') || clean.startsWith('/applications')) return 'jobs';
   if (clean.startsWith('/skill-registry') || clean.startsWith('/skills')) return 'skill-registry';
   if (clean.startsWith('/opportunities')) return 'opportunities';
@@ -118,6 +121,7 @@ export default function StudentHubApp({ path, onNavigate }) {
         {active === 'mentorship' && <><PageHeading eyebrow="GROW WITH GUIDANCE" title="Coaching & mentorship" description="Get practical feedback from people who've solved the problems you're working on."/><div className="mentor-grid">{mentors.map(m=><article className="hub-card mentor-card" key={m.id}><div className="mentor-top"><div className="avatar mentor-avatar">{m.initials}</div><span className="rating">★ {m.rating}</span></div><h3>{m.name}</h3><p>{m.role}</p><div className="mentor-specialty">{m.specialty}</div><div className="mentor-availability"><Clock3 size={14}/>{m.availability}</div><button className="button-primary full-button" onClick={() => go('/coaching/book')}>Book a session <ArrowRight size={15}/></button></article>)}</div><div className="question-banner"><MessageCircle size={20}/><div><b>Have a question for the community?</b><p>Share a blocker and learn from other students and mentors.</p></div><button className="button-secondary" onClick={() => go('/community')}>Open Q&A <ArrowRight size={15}/></button></div></>}
         {(active === 'skill-registry' || active === 'opportunities' || active === 'messages') && <NetworkFeatures active={active} path={path} onNavigate={go} />}
         {active === 'ai-prompts' && <AIPromptGuide />}
+        {active === 'summer-jobs' && <SummerJobs />}
         {active === 'jobs' && <><PageHeading eyebrow="YOUR NEXT OPPORTUNITY" title="Jobs & internships" description="Discover opportunities that match your skills and keep your application journey organized."/><FilterBar value={filter} onChange={setFilter} options={['All','Internship','Full-time']}/><div className="job-grid">{matchingJobs.map(job=><JobCard key={job.id} job={job} saved={saved.includes(job.id)} onSave={toggleSaved} onOpen={setSelectedId}/>)}</div><div className="application-note"><BriefcaseBusiness size={19}/><div><b>Keep your applications moving</b><p>Your application tracker will bring saved roles, deadlines, and progress into one place.</p></div><button className="text-action" onClick={() => setNotice('Application tracking will be enabled when the API is connected.')}>Application tracker <ArrowRight size={15}/></button></div></>}
         {active === 'community' && <><PageHeading eyebrow="YOU'RE NOT LEARNING ALONE" title="Community & announcements" description="Stay in the loop, meet other learners, and find your next community event."/><div className="community-layout"><section><div className="section-heading"><div><h2>Latest announcements</h2><p>Updates from across the Student Hub.</p></div></div><div className="announcement-list">{announcements.map(a=><article className="announcement-card" key={a.id}><div className="announcement-mark"><Bell size={18}/></div><div className="announcement-body"><div className="card-kicker">{a.label}<span>·</span>{a.date}</div><h3>{a.title}</h3><p>{a.detail}</p></div><button className="icon-button" onClick={() => setNotice('Event registration will be available after backend integration.')} aria-label="View announcement"><ArrowRight size={17}/></button></article>)}</div></section><aside className="community-side"><div className="community-highlight"><div className="promo-icon"><Users size={19}/></div><h3>Better together</h3><p>Share what you're building, ask questions, and help another learner move forward.</p><button className="button-primary full-button" onClick={() => setNotice('Discussion rooms are planned for the community integration phase.')}>Explore discussions</button></div><div className="community-stat"><span>Upcoming community event</span><b>Build Night</b><small>Tomorrow · 6:30 PM</small></div></aside></div></>}
         {active === 'saved' && <><PageHeading eyebrow="YOUR PERSONAL LIBRARY" title="Saved items" description="Pick up where you left off with resources and opportunities you bookmarked."/><div className="resource-grid">{savedItems.map(item => item.company ? <JobCard key={item.id} job={item} saved onSave={toggleSaved} onOpen={setSelectedId}/> : <ResourceCard key={item.id} item={item} saved onSave={toggleSaved} onOpen={setSelectedId}/>)}</div>{!savedItems.length && <EmptyState title="Your library starts here" text="Save courses, notes, and jobs to find them quickly later."/>}</>}
