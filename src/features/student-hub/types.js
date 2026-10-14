@@ -8,5 +8,9 @@
  * @typedef {{id:string,mentorId:string,startsAt:string,endsAt:string,timezone:string,status:'available'|'booked'|'blocked'}} MentorshipSlot
  * @typedef {{id:string,title:string,company:string,description:string,location:string,employmentType:'internship'|'full-time'|'part-time',applicationUrl?:string,deadline?:string,skills:string[],status:'open'|'closed'}} JobPosting
  * @typedef {{id:string,displayName:string,email:string,avatarUrl?:string,educationLevel?:string,institution?:string,skills:string[],interests:string[],roles:Array<'student'|'mentor'|'admin'>}} StudentProfile
+ * @typedef {{id:string,profileId:string,displayName:string,headline:string,city:string,area?:string,workMode:string,proficiency:CourseLevel,skills:string[],availability:string,visible:boolean}} SkillRegistryEntry
+ * @typedef {{id:string,title:string,organization:string,description:string,location:string,workMode:'remote'|'hybrid'|'on-site',type:'internship'|'full-time'|'freelance'|'project',compensation?:string,skills:string[],postedBy:string,status:'open'|'closed',publishedAt:string}} Opportunity
+ * @typedef {{id:string,participantIds:string[],status:'active'|'archived',updatedAt:string}} Conversation
+ * @typedef {{id:string,conversationId:string,senderId:string,body:string,createdAt:string,readAt?:string}} DirectMessage
  */
 export {};
