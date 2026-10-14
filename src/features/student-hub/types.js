@@ -12,5 +12,7 @@
  * @typedef {{id:string,title:string,organization:string,description:string,location:string,workMode:'remote'|'hybrid'|'on-site',type:'internship'|'full-time'|'freelance'|'project',compensation?:string,skills:string[],postedBy:string,status:'open'|'closed',publishedAt:string}} Opportunity
  * @typedef {{id:string,participantIds:string[],status:'active'|'archived',updatedAt:string}} Conversation
  * @typedef {{id:string,conversationId:string,senderId:string,body:string,createdAt:string,readAt?:string}} DirectMessage
+ * @typedef {{id:string,label:string,description:string,icon:string,accent:string}} PromptArea
+ * @typedef {{id:string,area:string,title:string,level:string,summary:string,fields:Array<{key:string,label:string,placeholder:string}>,template:string}} PromptGuide
  */
 export {};
