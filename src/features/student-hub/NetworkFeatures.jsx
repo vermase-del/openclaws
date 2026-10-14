@@ -30,13 +30,14 @@ function PageHeading({ eyebrow, title, description, count }) {
 function FilterSelect({ label, value, onChange, options }) {
   return <label className="network-filter"><span>{label}</span><select value={value} onChange={e => onChange(e.target.value)}>{options.map(option => <option key={option} value={option}>{option}</option>)}</select></label>;
 }
-function startConversation(id, onNavigate) { onNavigate('/messages/' + id); }
-
 export default function NetworkFeatures({ active, path, onNavigate }) {
   const [skillSearch, setSkillSearch] = useState('');
   const [skillCity, setSkillCity] = useState('All locations');
   const [skillLevel, setSkillLevel] = useState('All levels');
   const [opportunitySearch, setOpportunitySearch] = useState('');
+  const [communityOpportunities, setCommunityOpportunities] = useState(() => { try { const stored = localStorage.getItem('studenthub_opportunities'); return stored ? JSON.parse(stored) : opportunityPosts; } catch { return opportunityPosts; } });
+  const [showPostForm, setShowPostForm] = useState(false);
+  const [newPost, setNewPost] = useState({ title: '', company: '', city: 'Bengaluru', mode: 'Hybrid', type: 'Internship', compensation: '', skills: '', description: '' });
   const [opportunityCity, setOpportunityCity] = useState('All locations');
   const [opportunityType, setOpportunityType] = useState('All types');
   const [conversations, setConversations] = useState(() => {
@@ -53,19 +54,29 @@ export default function NetworkFeatures({ active, path, onNavigate }) {
   const skillQuery = skillSearch.trim().toLowerCase();
   const opportunityQuery = opportunitySearch.trim().toLowerCase();
   const filteredProfiles = useMemo(() => skillProfiles.filter(profile =>
-    (skillCity === 'All locations' || profile.city === skillCity) &&
+    (skillCity === 'All locations' || profile.city === skillCity || (skillCity === 'Remote' && /remote/i.test(profile.mode))) &&
     (skillLevel === 'All levels' || profile.level === skillLevel) &&
     (!skillQuery || [profile.name, profile.headline, profile.city, profile.area, ...profile.skills].join(' ').toLowerCase().includes(skillQuery))
   ), [skillCity, skillLevel, skillQuery]);
-  const filteredOpportunities = useMemo(() => opportunityPosts.filter(post =>
+  const filteredOpportunities = useMemo(() => communityOpportunities.filter(post =>
     (opportunityCity === 'All locations' || post.city === opportunityCity || (opportunityCity === 'Remote' && post.mode === 'Remote')) &&
     (opportunityType === 'All types' || post.type === opportunityType) &&
     (!opportunityQuery || [post.title, post.company, post.city, post.area, ...post.skills].join(' ').toLowerCase().includes(opportunityQuery))
   ), [opportunityCity, opportunityType, opportunityQuery]);
   const currentConversation = conversations.find(item => item.id === selectedConversation) || conversations[0];
+  const openConversation = id => {
+    const profile = skillProfiles.find(item => item.id === id);
+    if (profile && !conversations.some(item => item.id === id)) {
+      setConversations(previous => [...previous, { id, name: profile.name, initials: profile.initials, headline: profile.headline, lastMessage: 'Start a conversation', unread: 0, messages: [] }]);
+    }
+    setSelectedConversation(id);
+    setNotice('');
+    onNavigate('/messages/' + id);
+  };
 
   useEffect(() => { try { localStorage.setItem('studenthub_messages', JSON.stringify(conversations)); } catch {} }, [conversations]);
   useEffect(() => { try { localStorage.setItem('studenthub_interest', JSON.stringify(requested)); } catch {} }, [requested]);
+  useEffect(() => { try { localStorage.setItem('studenthub_opportunities', JSON.stringify(communityOpportunities)); } catch {} }, [communityOpportunities]);
   useEffect(() => {
     const parts = path.split('?')[0].split('/').filter(Boolean);
     if (parts[0] === 'messages' && parts[1] && conversations.some(item => item.id === parts[1])) setSelectedConversation(parts[1]);
@@ -92,14 +103,14 @@ export default function NetworkFeatures({ active, path, onNavigate }) {
     <PageHeading eyebrow="FIND YOUR PEOPLE" title="Location-wise skill registry" description="Discover learners, mentors, and collaborators by skills and the places they can work or connect." count={filteredProfiles.length}/>
     <div className="network-toolbar"><label className="network-search"><Search size={17}/><input value={skillSearch} onChange={e => setSkillSearch(e.target.value)} placeholder="Search skills, people, or areas..." /></label><FilterSelect label="Location" value={skillCity} onChange={setSkillCity} options={cities}/><FilterSelect label="Proficiency" value={skillLevel} onChange={setSkillLevel} options={['All levels','Beginner','Intermediate','Advanced']}/></div>
     <div className="network-summary"><Users size={17}/><span>Browse demo profiles across <b>Bengaluru, Hyderabad, Chennai, Pune</b> and remote.</span><span className="privacy-note">Profile visibility is opt-in in the planned production version.</span></div>
-    <div className="skill-profile-grid">{filteredProfiles.map(profile => <article className="hub-card skill-profile-card" key={profile.id}><div className="skill-profile-top"><div className="avatar skill-avatar">{profile.initials}</div><span className="level-pill">{profile.level}</span></div><h3>{profile.name} <BadgeCheck size={14} className="demo-badge" aria-label="Demo profile"/></h3><p className="skill-headline">{profile.headline}</p><div className="skill-location"><MapPin size={14}/>{profile.area}, {profile.city}</div><p className="skill-bio">{profile.bio}</p><div className="tag-row">{profile.skills.map(skill => <span className="hub-tag" key={skill}>{skill}</span>)}</div><div className="skill-availability"><span className="availability-dot"/>{profile.availability}</div><button className="button-secondary full-button" onClick={() => startConversation(profile.id, onNavigate)}><MessageSquare size={15}/> Message profile</button></article>)}</div>
+    <div className="skill-profile-grid">{filteredProfiles.map(profile => <article className="hub-card skill-profile-card" key={profile.id}><div className="skill-profile-top"><div className="avatar skill-avatar">{profile.initials}</div><span className="level-pill">{profile.level}</span></div><h3>{profile.name} <BadgeCheck size={14} className="demo-badge" aria-label="Demo profile"/></h3><p className="skill-headline">{profile.headline}</p><div className="skill-location"><MapPin size={14}/>{profile.area}, {profile.city}</div><p className="skill-bio">{profile.bio}</p><div className="tag-row">{profile.skills.map(skill => <span className="hub-tag" key={skill}>{skill}</span>)}</div><div className="skill-availability"><span className="availability-dot"/>{profile.availability}</div><button className="button-secondary full-button" onClick={() => openConversation(profile.id)><MessageSquare size={15}/> Message profile</button></article>)}</div>
     {!filteredProfiles.length && <div className="empty-state"><h3>No matching profiles</h3><p>Try a different skill, location, or proficiency filter.</p></div>}
   </section>;
 
   if (active === 'opportunities') return <section className="network-page">
     <PageHeading eyebrow="MAKE YOUR NEXT MOVE" title="Opportunity board" description="Find jobs, internships, paid projects, and collaborations near you or across remote teams." count={filteredOpportunities.length}/>
     <div className="network-toolbar"><label className="network-search"><Search size={17}/><input value={opportunitySearch} onChange={e => setOpportunitySearch(e.target.value)} placeholder="Search role, organization, or skill..." /></label><FilterSelect label="Location" value={opportunityCity} onChange={setOpportunityCity} options={cities}/><FilterSelect label="Opportunity" value={opportunityType} onChange={setOpportunityType} options={['All types','Internship','Full-time','Freelance','Project']}/></div>
-    <div className="opportunity-list">{filteredOpportunities.map(post => <article className="opportunity-card" key={post.id}><div className="opportunity-mark"><BriefcaseBusiness size={21}/></div><div className="opportunity-main"><div className="opportunity-meta"><span className="opportunity-type">{post.type}</span><span>Posted {post.posted}</span></div><h3>{post.title}</h3><div className="opportunity-company">{post.company}</div><p>{post.description}</p><div className="opportunity-details"><span><MapPin size={14}/>{post.area}, {post.city}</span><span><Clock3 size={14}/>{post.mode}</span><b>{post.compensation}</b></div><div className="tag-row">{post.skills.map(skill => <span className="hub-tag" key={skill}>{skill}</span>)}</div></div><div className="opportunity-actions"><button className={requested.includes(post.id) ? 'button-primary' : 'button-secondary'} onClick={() => registerInterest(post.id)}>{requested.includes(post.id) ? 'Interest saved' : 'I’m interested'} <ArrowRight size={14}/></button><button className="text-action" onClick={() => startConversation(post.posterId, onNavigate)}><MessageSquare size={14}/> Message publisher</button></div></article>)}</div>
+    <div className="opportunity-list">{filteredOpportunities.map(post => <article className="opportunity-card" key={post.id}><div className="opportunity-mark"><BriefcaseBusiness size={21}/></div><div className="opportunity-main"><div className="opportunity-meta"><span className="opportunity-type">{post.type}</span><span>Posted {post.posted}</span></div><h3>{post.title}</h3><div className="opportunity-company">{post.company}</div><p>{post.description}</p><div className="opportunity-details"><span><MapPin size={14}/>{post.area}, {post.city}</span><span><Clock3 size={14}/>{post.mode}</span><b>{post.compensation}</b></div><div className="tag-row">{post.skills.map(skill => <span className="hub-tag" key={skill}>{skill}</span>)}</div></div><div className="opportunity-actions"><button className={requested.includes(post.id) ? 'button-primary' : 'button-secondary'} onClick={() => registerInterest(post.id)}>{requested.includes(post.id) ? 'Interest saved' : 'I’m interested'} <ArrowRight size={14}/></button><button className="text-action" onClick={() => openConversation(post.posterId)><MessageSquare size={14}/> Message publisher</button></div></article>)}</div>
     {!filteredOpportunities.length && <div className="empty-state"><h3>No opportunities match</h3><p>Try another location, opportunity type, or keyword.</p></div>}
     <div className="network-disclaimer">Demo listings only. Employer verification, moderation, applications, and closing dates will be enforced through backend services.</div>
   </section>;
