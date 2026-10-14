@@ -11,6 +11,7 @@ A responsive Student Hub experience built on the existing React 18 + Vite applic
 - Opportunity board with location/type filters, skill tags, interest tracking, and a demo listing form
 - Direct-message inbox with seeded conversations, message composer, and profile/opportunity entry points
 - AI Prompt Guide with eight fixed areas, 16 reusable templates, search/filter, editable prompt builder, clipboard copy, and saved prompts
+- Summer Jobs page focused on earning while learning, with student-friendly role listings, pay/hours/duration transparency, location/work-mode filters, saved roles, demo application tracking, and an employer role-submission form
 - Global search / command palette (`Ctrl+K` or `⌘K`)
 - Demo saved items stored in localStorage
 - JSDoc domain contracts prepared for migration to TypeScript
@@ -33,11 +34,18 @@ npm run dev
 - `/opportunities`
 - `/messages` and `/messages/:profileId`
 - `/ai-prompts` (also `/ai-guide`)
+- `/summer-jobs` (also `/earn-while-you-learn`)
 - `/community`
 - `/saved`, `/profile`
 - `/talentlens` — existing TalentLens / MEGACLAW experience
 
 The current routing is a lightweight History API implementation to avoid changing the existing dependency lockfile during the first safe refactoring pass. A dedicated router, TypeScript migration, test runner, backend APIs, and real authentication should be introduced as separate validated steps.
+
+## Summer Jobs — earn while you learn
+
+The Summer Jobs page demonstrates student-friendly part-time work, paid internships, and scoped projects. Listings show compensation, hours, duration, work mode, location, skills, and eligibility notes. Students can filter listings, save roles, and mark demo applications; employers can draft a listing in the page. Demo applications and employer-submitted listings are saved only in the current browser and are not sent to employers or publicly published. Seeded organizations and pay ranges are examples, not verified real vacancies.
+
+Before launch, add employer identity verification and moderation, backend publication and application workflows, explicit pay and working-hours terms, lawful age/eligibility checks, privacy and anti-scam reporting, and appropriate safeguards for minors. Do not present a submitted listing as public until it has passed review.
 
 ## AI Prompt Guide
 
