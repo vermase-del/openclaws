@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, Clock3, MapPin, MessageSquare, Plus, Search, Send, SlidersHorizontal, Users } from 'lucide-react';
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, Clock3, MapPin, MessageSquare, Plus, Search, Send, Users } from 'lucide-react';
 
 const skillProfiles = [
   { id: 'student-asha', name: 'Asha Reddy', initials: 'AR', headline: 'Frontend developer in training', city: 'Bengaluru', area: 'Whitefield', mode: 'Hybrid / remote', skills: ['React', 'JavaScript', 'CSS', 'Figma'], level: 'Intermediate', availability: 'Open to internships', bio: 'Building accessible interfaces and contributing to small open-source projects.' },
