@@ -12,6 +12,7 @@ const summerRoles = [
 
 const readApplications = () => { try { return JSON.parse(localStorage.getItem('studenthub_summer_applications') || '[]'); } catch { return []; } };
 const readSaved = () => { try { return JSON.parse(localStorage.getItem('studenthub_summer_saved') || '[]'); } catch { return []; } };
+const readCustomRoles = () => { try { return JSON.parse(localStorage.getItem('studenthub_summer_custom_roles') || '[]'); } catch { return []; } };
 
 export default function SummerJobs() {
  const [query,setQuery]=useState('');
@@ -22,20 +23,48 @@ export default function SummerJobs() {
  const [selected,setSelected]=useState(null);
  const [applications,setApplications]=useState(readApplications);
  const [saved,setSaved]=useState(readSaved);
+ const [customRoles,setCustomRoles]=useState(readCustomRoles);
+ const [showPostForm,setShowPostForm]=useState(false);
+ const [newRole,setNewRole]=useState({title:'',organization:'',city:'Bengaluru',mode:'Remote',type:'Part-time',pay:'',hours:'',duration:'',category:'Technology',skills:'',description:'',requirements:''});
  const [appliedOnly,setAppliedOnly]=useState(false);
  const [notice,setNotice]=useState('');
- const filtered=useMemo(()=>summerRoles.filter(role=>{
+ const allRoles=useMemo(()=>[...customRoles,...summerRoles],[customRoles]);
+ const filtered=useMemo(()=>allRoles.filter(role=>{
   const text=[role.title,role.organization,role.city,role.category,role.description,...role.skills].join(' ').toLowerCase();
   return (!query.trim()||text.includes(query.trim().toLowerCase()))&&(city==='All locations'||role.city===city)&&(mode==='Any mode'||role.mode===mode)&&(category==='All areas'||role.category===category)&&(kind==='All types'||role.type===kind)&&(!appliedOnly||applications.includes(role.id));
- }),[query,city,mode,category,kind,appliedOnly,applications]);
+ }),[allRoles,query,city,mode,category,kind,appliedOnly,applications]);
  useEffect(()=>{try{localStorage.setItem('studenthub_summer_applications',JSON.stringify(applications))}catch{}},[applications]);
  useEffect(()=>{try{localStorage.setItem('studenthub_summer_saved',JSON.stringify(saved))}catch{}},[saved]);
+ useEffect(()=>{try{localStorage.setItem('studenthub_summer_custom_roles',JSON.stringify(customRoles))}catch{}},[customRoles]);
  const apply=id=>{if(!applications.includes(id)){setApplications(previous=>[...previous,id]);setNotice('Demo application saved in this browser only. The employer has not received it.')}else setNotice('You have already marked this demo role as applied.');setSelected(null)};
  const toggleSaved=id=>setSaved(previous=>previous.includes(id)?previous.filter(x=>x!==id):[...previous,id]);
+ const publishRole=event=>{
+  event.preventDefault();
+  if(!newRole.title.trim()||!newRole.organization.trim()||!newRole.pay.trim()||!newRole.hours.trim()||!newRole.duration.trim())return;
+  const role={...newRole,id:'community-summer-'+Date.now(),title:newRole.title.trim(),organization:newRole.organization.trim(),pay:newRole.pay.trim(),hours:newRole.hours.trim(),duration:newRole.duration.trim(),skills:newRole.skills.split(',').map(s=>s.trim()).filter(Boolean).slice(0,8),description:newRole.description.trim()||'Contact the listing publisher for role details.',requirements:newRole.requirements.trim()||'Requirements to be agreed with the publisher.',posted:'Just now',posterSubmitted:true};
+  setCustomRoles(previous=>[role,...previous]);setShowPostForm(false);setNewRole({title:'',organization:'',city:'Bengaluru',mode:'Remote',type:'Part-time',pay:'',hours:'',duration:'',category:'Technology',skills:'',description:'',requirements:''});setNotice('Demo listing saved in this browser only. It is not publicly published or verified.');
+ };
  return <section className="summer-page">
   <div className="summer-hero"><div className="summer-hero-copy"><span className="summer-eyebrow">EARN WHILE YOU LEARN</span><h1>Make your summer count.</h1><p>Find flexible, student-friendly paid work that fits around classes and helps you build real-world skills.</p><div className="summer-hero-points"><span><CheckCircle2 size={14}/> Clear time expectations</span><span><CheckCircle2 size={14}/> Skill-building tasks</span><span><CheckCircle2 size={14}/> Pay shown upfront</span></div></div><div className="summer-hero-art"><div className="summer-art-circle"><BriefcaseBusiness size={36}/></div><div className="summer-art-card"><Coins size={17}/><span><b>Earn + learn</b><small>Experience that adds up</small></span></div></div></div>
-  <div className="summer-impact-grid"><div><span className="summer-stat-icon"><BriefcaseBusiness size={17}/></span><span><b>{summerRoles.length} demo roles</b><small>Across student-friendly areas</small></span></div><div><span className="summer-stat-icon"><Clock3 size={17}/></span><span><b>Flexible schedules</b><small>Part-time and project options</small></span></div><div><span className="summer-stat-icon"><ShieldCheck size={17}/></span><span><b>Safety first</b><small>Review employers before applying</small></span></div></div>
-  <div className="summer-section-heading"><div><span className="summer-eyebrow dark">YOUR NEXT STEP</span><h2>Summer jobs & paid projects</h2><p>Explore sample listings and find work that matches your schedule and skills.</p></div><button className={'button-secondary summer-applied-filter '+(appliedOnly?'selected':'')} onClick={()=>setAppliedOnly(v=>!v)}><CheckCircle2 size={15}/>{appliedOnly?'Showing marked applications':'My applications'} <span>{applications.length}</span></button></div>
+  <div className="summer-impact-grid"><div><span className="summer-stat-icon"><BriefcaseBusiness size={17}/></span><span><b>{allRoles.length} demo roles</b><small>Across student-friendly areas</small></span></div><div><span className="summer-stat-icon"><Clock3 size={17}/></span><span><b>Flexible schedules</b><small>Part-time and project options</small></span></div><div><span className="summer-stat-icon"><ShieldCheck size={17}/></span><span><b>Safety first</b><small>Review employers before applying</small></span></div></div>
+  <div className="summer-section-heading"><div><span className="summer-eyebrow dark">YOUR NEXT STEP</span><h2>Summer jobs & paid projects</h2><p>Explore sample listings and find work that matches your schedule and skills.</p></div><div className="summer-heading-actions"><button className="button-primary summer-post-button" onClick={()=>setShowPostForm(v=>!v)}><BriefcaseBusiness size={15}/>{showPostForm?'Close form':'Offer a student job'}</button><button className={'button-secondary summer-applied-filter '+(appliedOnly?'selected':'')} onClick={()=>setAppliedOnly(v=>!v)}><CheckCircle2 size={15}/>{appliedOnly?'Showing marked applications':'My applications'} <span>{applications.length}</span></button></div></div>
+  {showPostForm && <form className="summer-post-form" onSubmit={publishRole}>
+   <div className="summer-post-form-heading"><div><b>Offer a student-friendly role</b><p>Share clear pay, hours, duties and eligibility before recruiting students.</p></div><span>Demo only · local browser</span></div>
+   <div className="summer-post-form-grid">
+    <label>Role title<input required maxLength={100} value={newRole.title} onChange={e=>setNewRole({...newRole,title:e.target.value})} placeholder="e.g. Junior Web Assistant"/></label>
+    <label>Organization<input required maxLength={100} value={newRole.organization} onChange={e=>setNewRole({...newRole,organization:e.target.value})} placeholder="Organization / employer name"/></label>
+    <label>Location<select value={newRole.city} onChange={e=>setNewRole({...newRole,city:e.target.value})}>{['Bengaluru','Hyderabad','Chennai','Pune','Remote'].map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Work mode<select value={newRole.mode} onChange={e=>setNewRole({...newRole,mode:e.target.value})}>{['Remote','Hybrid','On-site'].map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Employment type<select value={newRole.type} onChange={e=>setNewRole({...newRole,type:e.target.value})}>{['Part-time','Paid internship','Flexible project','Paid project'].map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Area<select value={newRole.category} onChange={e=>setNewRole({...newRole,category:e.target.value})}>{['Technology','Creative','Research','Operations'].map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Pay / compensation<input required maxLength={80} value={newRole.pay} onChange={e=>setNewRole({...newRole,pay:e.target.value})} placeholder="e.g. ₹300/hour"/></label>
+    <label>Hours / schedule<input required maxLength={80} value={newRole.hours} onChange={e=>setNewRole({...newRole,hours:e.target.value})} placeholder="e.g. 6 hours/week"/></label>
+    <label>Duration<input required maxLength={80} value={newRole.duration} onChange={e=>setNewRole({...newRole,duration:e.target.value})} placeholder="e.g. 6 weeks"/></label>
+    <label>Skills (comma-separated)<input maxLength={200} value={newRole.skills} onChange={e=>setNewRole({...newRole,skills:e.target.value})} placeholder="e.g. HTML, CSS, communication"/></label>
+    <label className="summer-form-wide">Role description<textarea rows={3} maxLength={700} value={newRole.description} onChange={e=>setNewRole({...newRole,description:e.target.value})} placeholder="Duties, training and expected outcomes"/></label>
+    <label className="summer-form-wide">Requirements / eligibility<textarea rows={2} maxLength={500} value={newRole.requirements} onChange={e=>setNewRole({...newRole,requirements:e.target.value})} placeholder="Age eligibility, experience, equipment, availability"/></label>
+   </div><div className="summer-post-form-footer"><span>Production listings must be verified before becoming visible to students.</span><button className="button-primary" type="submit">Save demo listing <ArrowRight size={14}/></button></div>
+  </form>}
   <div className="summer-filter-panel"><label className="summer-search"><Search size={16}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search roles, skills, organizations..."/>{query&&<button onClick={()=>setQuery('')} aria-label="Clear search"><X size={14}/></button>}</label><label className="summer-filter"><MapPin size={14}/><select value={city} onChange={e=>setCity(e.target.value)}>{['All locations','Bengaluru','Hyderabad','Chennai','Pune','Remote'].map(x=><option key={x}>{x}</option>)}</select></label><label className="summer-filter"><SlidersHorizontal size={14}/><select value={mode} onChange={e=>setMode(e.target.value)}>{['Any mode','Remote','Hybrid','On-site'].map(x=><option key={x}>{x}</option>)}</select></label><label className="summer-filter"><select value={category} onChange={e=>setCategory(e.target.value)}>{['All areas','Technology','Creative','Research','Operations'].map(x=><option key={x}>{x}</option>)}</select></label><label className="summer-filter"><select value={kind} onChange={e=>setKind(e.target.value)}>{['All types','Part-time','Paid internship','Flexible project','Paid project'].map(x=><option key={x}>{x}</option>)}</select></label></div>
   {notice&&<div className="summer-notice"><span>{notice}</span><button onClick={()=>setNotice('')} aria-label="Dismiss notice"><X size={14}/></button></div>}
   <div className="summer-results-label"><span><b>{filtered.length}</b> matching opportunities</span><span>Demo listings · sample compensation</span></div>
