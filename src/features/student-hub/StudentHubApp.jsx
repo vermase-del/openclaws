@@ -72,7 +72,7 @@ export default function StudentHubApp({ path, onNavigate }) {
     const onKey = e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setCommandOpen(v => !v); } if (e.key === 'Escape') { setCommandOpen(false); setMobileNavOpen(false); setSelectedId(null); } };
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
   }, []);
-  useEffect(() => { const match = path.match(/^\\/(learning|classes|jobs)\\/([^/]+)/); setSelectedId(match ? match[2] : path === '/coaching/book' ? '__booking__' : null); setSearch(''); }, [path]);
+  useEffect(() => { const parts = path.split('/').filter(Boolean); const hasDetail = ['learning', 'classes', 'jobs'].includes(parts[0]) && Boolean(parts[1]); setSelectedId(hasDetail ? parts[1] : path === '/coaching/book' ? '__booking__' : null); setSearch(''); }, [path]);
   const go = to => { setMobileNavOpen(false); setCommandOpen(false); onNavigate(to); };
   const toggleSaved = id => setSaved(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const pageTitle = nav.find(n => n.id === active)?.label || (active === 'saved' ? 'Saved items' : active === 'profile' ? 'Your profile' : 'Your dashboard');
