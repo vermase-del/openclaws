@@ -14,5 +14,6 @@
  * @typedef {{id:string,conversationId:string,senderId:string,body:string,createdAt:string,readAt?:string}} DirectMessage
  * @typedef {{id:string,label:string,description:string,icon:string,accent:string}} PromptArea
  * @typedef {{id:string,area:string,title:string,level:string,summary:string,fields:Array<{key:string,label:string,placeholder:string}>,template:string}} PromptGuide
+ * @typedef {{id:string,title:string,organization:string,city:string,mode:'Remote'|'Hybrid'|'On-site',type:string,pay:string,hours:string,duration:string,skills:string[],description:string,requirements:string,category:string,posted:string,verified?:boolean}} SummerJob
  */
 export {};
