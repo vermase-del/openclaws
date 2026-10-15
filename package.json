@@ -1,5 +1,5 @@
 {
-  "name": "talentlens-ai",
+  "name": "megaclaw-platform",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api:dev": "node server/health-server.mjs",
+    "api:check": "node scripts/check-api.mjs",
+    "check": "npm run build && npm run api:check"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
@@ -19,5 +22,6 @@
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.1.6"
-  }
+  },
+  "description": "Megaclaw multi-application platform foundation"
 }
