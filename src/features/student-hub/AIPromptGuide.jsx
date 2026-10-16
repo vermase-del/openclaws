@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, ArrowRight, BarChart3, BookOpen, Bookmark, BriefcaseBusiness,
+  ArrowLeft, ArrowRight, BarChart3, BookOpen, Bookmark, Briefcase,
   CalendarDays, Check, Code2, Copy, FileText, Layers, MessageCircle, Search,
   Sparkles, X
 } from 'lucide-react';
@@ -10,7 +10,7 @@ const areaIcons = {
   learning: BookOpen,
   coding: Code2,
   projects: Layers,
-  career: BriefcaseBusiness,
+  career: Briefcase,
   interviews: MessageCircle,
   writing: FileText,
   research: BarChart3,
