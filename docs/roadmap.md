@@ -9,7 +9,8 @@ This roadmap separates the validated frontend foundation from future backend wor
 - [x] Mock-first UI and browser-local demo workflows.
 - [x] Optional PostgreSQL 16 and Redis 7 local Compose services.
 - [x] Frontend CI workflow using `npm ci` and `npm run build`.
-- [ ] Automated frontend unit/component and browser smoke tests (planned).
+- [x] Node.js built-in unit tests for Student Hub route mapping and legacy aliases.
+- [ ] React component tests and browser smoke tests (planned).
 
 ## Next delivery slices
 

@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "api:dev": "node server/health-server.mjs",
     "api:check": "node scripts/check-api.mjs",
-    "check": "npm run build && npm run api:check"
+    "check": "npm run build && npm run api:check",
+    "test": "node --test tests/student-hub-routing.test.js"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
