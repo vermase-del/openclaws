@@ -10,6 +10,7 @@ import { learningResources, liveClasses, mentors, jobs, announcements } from './
 import NetworkFeatures from './NetworkFeatures';
 import AIPromptGuide from './AIPromptGuide';
 import SummerJobs from './SummerJobs';
+import { getStudentHubRoute } from './routing.js';
 
 const nav = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -25,22 +26,7 @@ const nav = [
   { id: 'community', label: 'Community & Announcements', icon: MessageCircle, path: '/community' }
 ];
 const iconMap = { 'code-2': Code2, coffee: Coffee, network: Network, database: Database };
-const getRoute = (path) => {
-  const clean = path.replace(/\/$/, '') || '/dashboard';
-  if (clean.startsWith('/learning')) return 'learning';
-  if (clean.startsWith('/mentorship') || clean.startsWith('/coaching')) return 'mentorship';
-  if (clean.startsWith('/classes') || clean.startsWith('/timetable')) return 'classes';
-  if (clean.startsWith('/summer-jobs') || clean.startsWith('/earn-while-you-learn')) return 'summer-jobs';
-  if (clean.startsWith('/jobs') || clean.startsWith('/applications')) return 'jobs';
-  if (clean.startsWith('/skill-registry') || clean.startsWith('/skills')) return 'skill-registry';
-  if (clean.startsWith('/opportunities')) return 'opportunities';
-  if (clean.startsWith('/messages')) return 'messages';
-  if (clean.startsWith('/ai-prompts') || clean.startsWith('/ai-guide')) return 'ai-prompts';
-  if (clean.startsWith('/community') || clean.startsWith('/events')) return 'community';
-  if (clean.startsWith('/saved')) return 'saved';
-  if (clean.startsWith('/profile')) return 'profile';
-  return 'dashboard';
-};
+
 
 function ResourceCard({ item, saved, onSave, onOpen }) {
   const Icon = iconMap[item.icon] || BookOpen;
@@ -71,7 +57,7 @@ export default function StudentHubApp({ path, onNavigate }) {
   const [notice, setNotice] = useState('');
   const [filter, setFilter] = useState('All');
   const [selectedId, setSelectedId] = useState(null);
-  const active = getRoute(path);
+  const active = getStudentHubRoute(path);
   const allSearchItems = [...learningResources.map(x => ({...x, kind:'Resource', route:'/learning'})), ...liveClasses.map(x => ({...x, kind:'Class', route:'/classes'})), ...jobs.map(x => ({...x, kind:'Job', route:'/jobs'}))];
   const query = search.trim().toLowerCase();
   const searchResults = allSearchItems.filter(x => !query || (x.title + ' ' + (x.description || '') + ' ' + (x.company || '')).toLowerCase().includes(query)).slice(0, 6);
