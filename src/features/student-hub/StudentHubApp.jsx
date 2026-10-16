@@ -1,7 +1,7 @@
 import './studentHub.css';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowDownRight, ArrowRight, Bell, Bookmark, BookOpen, BriefcaseBusiness, Coins,
+  ArrowDownRight, ArrowRight, Bell, Bookmark, BookOpen, Briefcase, Coins,
   CalendarDays, Check, ChevronDown, Clock3, Code2, Command, Coffee, Database,
   GraduationCap, LayoutDashboard, MapPin, Menu, MessageCircle, Network, Search, ShieldCheck, MessageSquare,
   Sparkles, Target, Users, X, Zap
@@ -16,10 +16,10 @@ const nav = [
   { id: 'learning', label: 'Learning Hub', icon: BookOpen, path: '/learning' },
   { id: 'mentorship', label: 'Coaching & Mentorship', icon: Target, path: '/mentorship' },
   { id: 'classes', label: 'Classes & Timetable', icon: CalendarDays, path: '/classes' },
-  { id: 'jobs', label: 'Jobs & Internships', icon: BriefcaseBusiness, path: '/jobs' },
+  { id: 'jobs', label: 'Jobs & Internships', icon: Briefcase, path: '/jobs' },
   { id: 'summer-jobs', label: 'Summer Jobs · Earn & Learn', icon: Coins, path: '/summer-jobs' },
   { id: 'skill-registry', label: 'Skill Registry', icon: MapPin, path: '/skill-registry' },
-  { id: 'opportunities', label: 'Opportunity Board', icon: BriefcaseBusiness, path: '/opportunities' },
+  { id: 'opportunities', label: 'Opportunity Board', icon: Briefcase, path: '/opportunities' },
   { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/messages' },
   { id: 'ai-prompts', label: 'AI Prompt Guide', icon: Sparkles, path: '/ai-prompts' },
   { id: 'community', label: 'Community & Announcements', icon: MessageCircle, path: '/community' }
