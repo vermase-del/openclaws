@@ -1,17 +1,17 @@
-name: CI
+name: Frontend CI
 
 on:
   push:
-    branches: [main, "foundation/**"]
+    branches: [main, "feat/**", "integration/**"]
   pull_request:
-    branches: [main]
+    branches: [main, "feat/student-hub-foundation"]
 
 permissions:
   contents: read
 
 jobs:
-  validate:
-    name: Build and smoke checks
+  frontend:
+    name: Install and build frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,7 +23,5 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Build web application
+      - name: Build frontend
         run: npm run build
-      - name: Smoke-test API starter
-        run: npm run api:check

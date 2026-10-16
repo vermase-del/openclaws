@@ -1,11 +1,13 @@
 # Dependencies
 node_modules/
 
-# Build output
-/dist/
+# Build and test output
+dist/
 coverage/
+playwright-report/
+test-results/
 
-# Secrets and local configuration
+# Local secrets and environment
 .env
 .env.*
 !.env.example
@@ -16,10 +18,13 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# Local data and IDE
+# Operating systems and editors
 .DS_Store
+Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Temporary tooling output
 .tmp/
 .cache/

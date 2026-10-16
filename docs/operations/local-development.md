@@ -1,28 +1,57 @@
 # Local Development Runbook
 
 ## Prerequisites
-- Node.js 20+ and npm
-- Docker Engine / Docker Desktop with Compose
 
-## First run
-1. Copy `.env.example` to `.env` and change local passwords if needed.
-2. Install dependencies with `npm ci`.
-3. Start databases with `docker compose up -d`.
-4. Start the UI using `npm run dev`.
-5. Start the API in another terminal using `npm run api:dev`.
-6. Check `http://localhost:4000/api/v1/health`.
+- Node.js 20+ and npm for the frontend.
+- Docker Engine/Desktop with Compose only if using local PostgreSQL and Redis.
 
-## Validation
-- `npm run build`: compile the web app.
-- `npm run api:check`: verify health and unknown-route behavior.
-- `npm run check`: run both checks.
-- `docker compose ps`: inspect infrastructure health.
+## Run the frontend
 
-## Stop
-Run `docker compose down` to stop services; volumes remain. Use `docker compose down -v` only if you intend to delete all local database/cache data.
+Install dependencies and start Vite:
 
-## Troubleshooting
-- If ports 3000, 4000, 5432, or 6379 are in use, change the related setting or stop the conflicting process.
-- Inspect database logs with `docker compose logs postgres` or `docker compose logs redis`.
-- For API issues, check `API_HOST`, `API_PORT`, and process output.
-- Compose credentials are for local development only. Do not expose these ports to untrusted networks or reuse local credentials in shared environments.
+```bash
+npm ci
+npm run dev
+```
+
+Use the local URL printed by Vite. Build validation is:
+
+```bash
+npm run build
+```
+
+## Start optional local infrastructure
+
+1. Copy `.env.example` to `.env`.
+2. Change the sample local PostgreSQL password if appropriate for your workstation.
+3. Start the services:
+
+```bash
+docker compose up -d
+docker compose ps
+docker compose logs postgres
+docker compose logs redis
+```
+
+PostgreSQL is bound to loopback port 5432 by default and Redis to loopback port 6379. Change the host port variables if either port is already in use. These services are not currently connected to the frontend, and no Spring Boot backend is included in this change.
+
+## Stop and clean up
+
+```bash
+docker compose down
+```
+
+This stops the services and retains named volumes. Use `docker compose down -v` only if you intentionally want to delete the local PostgreSQL and Redis data.
+
+## Validation and troubleshooting
+
+- `npm ci`: install dependencies from the lockfile.
+- `npm run build`: build the frontend for production.
+- `docker compose ps`: inspect service and health status.
+- `docker compose logs postgres` or `docker compose logs redis`: inspect infrastructure logs.
+
+If ports 5432 or 6379 are occupied, change `POSTGRES_PORT` or `REDIS_PORT` in your local `.env`. Compose credentials are for local development only. Do not expose development ports to untrusted networks or reuse local credentials in shared environments.
+
+## Current limitations
+
+The UI is mock-first and stores some demo state in the browser. The future Spring Boot API, database migrations, database connectivity, authentication, authorization, and backend integration tests are not available yet.

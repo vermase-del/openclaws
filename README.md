@@ -1,75 +1,80 @@
-# Megaclaw Platform
+# Student Hub + TalentLens
 
-Megaclaw is a multi-application platform shell with a shared UI and a path toward independently deployable, secure modules.
+A responsive Student Hub experience built on the existing React 18 + Vite application. The original TalentLens candidate and recruiter workspace remains accessible at `/talentlens`.
 
-## Current application
-The current React + Vite app includes candidate intake, recruiter review, and navigation placeholders. Existing UI is retained while the platform foundation is built additively.
+This repository is being evolved into a multi-module application platform. The current frontend remains **mock-first**; PostgreSQL and Redis are available for local infrastructure experiments, and Spring Boot is the planned backend. The infrastructure containers do not yet provide application APIs or persist the UI's demo workflows.
 
-## Stack
-- Web: React 18, Vite 5, lucide-react
-- Local infrastructure: PostgreSQL 16 and Redis 7 via Docker Compose
-- API starter: Node.js HTTP server using built-in modules
-- CI: GitHub Actions build and API smoke check
+## Current frontend
 
-The API and infrastructure are starters, not production-ready identity, persistence, or cache integrations.
+- React 18 + Vite 5
+- Responsive navigation and page shell
+- Learning resources, mentorship discovery, classes, jobs, announcements, saved items, and profile preview
+- Location-wise skill registry with skill, city, and proficiency filters
+- Opportunity board with location/type filters, skill tags, interest tracking, and a demo listing form
+- Direct-message inbox with seeded conversations, message composer, and profile/opportunity entry points
+- AI Prompt Guide with eight fixed areas, 16 reusable templates, search/filter, editable prompt builder, clipboard copy, and saved prompts
+- Summer Jobs page focused on earning while learning, with student-friendly role listings, pay/hours/duration transparency, location/work-mode filters, saved roles, demo application tracking, and an employer role-submission form
+- Global search / command palette (`Ctrl+K` or `⌘K`)
+- Demo saved items stored in localStorage
+- JSDoc domain contracts prepared for incremental TypeScript migration
 
-## Quick start
-Requirements: Node.js 20+, npm, and Docker Compose for infrastructure.
+## Run the frontend locally
+
+Requirements: Node.js 20+ and npm.
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Vite runs at `http://localhost:3000`.
-
-In another terminal:
-
-```bash
-npm run api:dev
-```
-
-Health endpoint: `http://localhost:4000/api/v1/health`.
-
-For local databases, copy `.env.example` to `.env`, then run `docker compose up -d`. PostgreSQL uses port 5432 and Redis port 6379 by default. Do not commit real secrets or expose development ports to untrusted networks.
-
-Run checks:
+Vite prints the local URL when it starts. Build the production frontend with:
 
 ```bash
 npm run build
-npm run api:check
-npm run check
 ```
 
-## Repository map
-```text
-.github/workflows/   CI
- docs/                architecture, API and operations docs
- infra/               local development infrastructure
- scripts/             validation scripts
- server/              lightweight API starter
- src/                 existing React application
- docker-compose.yml
- .env.example
+## Optional local infrastructure
+
+Docker Engine/Desktop with Docker Compose is needed only if you want local PostgreSQL and Redis containers.
+
+```bash
+cp .env.example .env
+docker compose up -d
+docker compose ps
 ```
 
-## Architecture principles
-1. Preserve existing modules; add capabilities through bounded folders and explicit interfaces.
-2. Use versioned HTTP contracts between browser and backend.
-3. PostgreSQL is the durable source of truth; Redis is only for ephemeral cache/coordination.
-4. Add authentication, authorization, tenant boundaries, validation, and auditing before business APIs are exposed.
-5. Keep secrets out of source control and avoid logging candidate personal information.
-6. Do not claim production readiness before persistence, migrations, identity, observability, backup/restore, deployment hardening, and tests are implemented.
+Stop containers with `docker compose down`. This retains named volumes. Use `docker compose down -v` only when you intend to delete local database and cache data. The sample credentials are for local development only; do not expose these ports to untrusted networks or reuse the credentials elsewhere.
 
-## Roadmap
-- [x] Retain the current React/Vite module shell.
-- [x] Add repository docs and environment template.
-- [x] Add PostgreSQL/Redis Compose services.
-- [x] Add API health endpoint and smoke test.
-- [x] Add CI web build and API check.
-- [ ] Add migrations and database access layer.
-- [ ] Move candidate data from browser storage to API-backed persistence.
-- [ ] Add identity, RBAC, tenant isolation, and audit events.
-- [ ] Add integration tests, observability, backups, deployment runbooks.
+## Routes
 
-See `docs/architecture/overview.md` and `docs/roadmap.md`.
+- `/dashboard`
+- `/learning` and `/learning/:courseId` (detail preview currently opens in a modal)
+- `/mentorship`, `/coaching/book`
+- `/classes`, `/classes/:id`
+- `/jobs`, `/jobs/:id`
+- `/skill-registry` (also `/skills`)
+- `/opportunities`
+- `/messages` and `/messages/:profileId`
+- `/ai-prompts` (also `/ai-guide`)
+- `/summer-jobs` (also `/earn-while-you-learn`)
+- `/community`
+- `/saved`, `/profile`
+- `/talentlens` — existing TalentLens / MEGACLAW experience
+
+Routing currently uses a lightweight History API implementation to avoid changing the existing dependency lockfile during the first safe refactoring pass. A dedicated router, TypeScript migration, test runner, backend APIs, and real authentication should be introduced as separate validated steps.
+
+## Demo and security notes
+
+This iteration uses mock data. Role switching is a UI preview only; it does not grant or enforce permissions. Booking and job application buttons are previews and do not submit transactions. Seeded organizations, roles, pay ranges, profiles, and opportunities are examples, not verified real vacancies. Demo applications, messages, saved prompts, and employer-submitted listings remain in the current browser and are not shared with other users. Do not store sensitive information in localStorage or enter confidential data into prompts intended for external AI services.
+
+Before production, implement employer identity verification and moderation, lawful age/eligibility checks, privacy and anti-scam reporting, authenticated profile ownership and visibility consent, server-side publication/application workflows, and secure messaging APIs with authorization, abuse reporting, rate limits, notifications, and retention controls. Do not present a submitted listing as public until it has passed review.
+
+## Architecture and roadmap
+
+- **Frontend:** React 18 + Vite 5; incremental TypeScript migration is planned.
+- **Data:** mock-first until backend contracts and persistence are implemented.
+- **Local infrastructure:** PostgreSQL 16 for durable data and optional Redis 7 for transient cache/coordination.
+- **Backend target:** Spring Boot modular monolith with versioned APIs, migrations, authentication/authorization, and tests. No Spring Boot application service is implemented by this change.
+- **CI:** install dependencies and validate the Vite production build.
+
+See [Architecture Overview](docs/architecture/overview.md), [API Conventions](docs/api/README.md), [Local Development Runbook](docs/operations/local-development.md), and [Roadmap](docs/roadmap.md).
